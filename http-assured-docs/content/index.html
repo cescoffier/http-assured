@@ -1,0 +1,44 @@
+---
+layout: landing
+title: http-assured
+---
+<h1 class="hero__title">http-assured</h1>
+<p class="hero__subtitle">
+    A modern Java HTTP test framework with a REST Assured-like DSL.
+    No Groovy. No Hamcrest. No static global config.
+</p>
+<a href="{site.url('/guides/getting-started')}" class="btn-primary">Get Started</a>
+
+<div class="features">
+    <div class="feature-card">
+        <div class="feature-card__title">Pure Java</div>
+        <p class="feature-card__desc">No Groovy dependency. No Hamcrest. Just Java 17+ with JUnit 5 assertions.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-card__title">Pluggable Engine</div>
+        <p class="feature-card__desc">SPI-based HTTP client. Vert.x by default, swap in JDK HttpClient or any custom engine.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-card__title">Fault Injection</div>
+        <p class="feature-card__desc">Built-in toxics for latency, connection resets, bandwidth limits. No external proxy needed.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-card__title">WebSocket Testing</div>
+        <p class="feature-card__desc">Session-based WebSocket API with blocking await and Mutiny Multi streaming.</p>
+    </div>
+</div>
+
+<div class="content" style="padding-top: 3rem;">
+    <h2 style="text-align: center; border: none;">Quick Example</h2>
+    <pre><code class="language-java">HttpAssured client = HttpAssured.builder()
+    .baseUri("http://localhost:8080")
+    .build();
+
+client.given()
+    .header("Accept", "application/json")
+.when()
+    .get("/users")
+.then()
+    .statusCode(200)
+    .body("name", Assertions::isNotNull);</code></pre>
+</div>

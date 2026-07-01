@@ -1,0 +1,305 @@
+---
+layout: guide
+title: Responses
+description: Assert status, body, headers, and extract values from HTTP responses
+---
+include::../../_includes/attributes.adoc[]
+
+= Responses
+
+Validate HTTP responses using the `then()` phase. All assertion methods return the `ValidatableResponse` for chaining.
+
+== Status Code
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=status-code]
+----
+
+== Status Line
+
+The status line contains the status code and reason phrase (without HTTP version prefix):
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=status-line]
+----
+
+== Body Assertions
+
+Use `body(path, assertion)` with a JSON path expression and a `BodyAssertion`:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=body-assertion]
+----
+
+=== Available Assertions
+
+All methods are static imports from `io.smallrye.httpassured.assertion.Assertions`:
+
+[cols="1,2"]
+|===
+|Method |Description
+
+|`isEqualTo(expected)`
+|Value equals expected
+
+|`isNotEqualTo(unexpected)`
+|Value does not equal unexpected
+
+|`isNull()`
+|Value is null
+
+|`isNotNull()`
+|Value is not null
+
+|`containsString(sub)`
+|String contains substring
+
+|`matchesPattern(regex)`
+|String matches regular expression
+
+|`hasSize(n)`
+|Collection or array has n elements
+
+|`contains(element)`
+|Collection contains element
+
+|`containsAll(e1, e2, ...)`
+|Collection contains all elements
+
+|`greaterThan(n)`
+|Comparable value is greater than n
+
+|`lessThan(n)`
+|Comparable value is less than n
+
+|`allMatch(predicate)`
+|All elements match predicate
+
+|`anyMatch(predicate)`
+|At least one element matches predicate
+
+|`satisfies(predicate)`
+|Custom predicate check
+|===
+
+=== Multi-Path Assertions
+
+Assert multiple paths in a single call:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=multi-path]
+----
+
+=== Whole-Body Assertions
+
+Assert against the entire response body as a string:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=body-contains]
+----
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=body-equals]
+----
+
+== JSON Schema Validation
+
+Validate the response against a JSON Schema file on the classpath:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=json-schema-classpath]
+----
+
+Or from an inline schema string:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=json-schema-string]
+----
+
+== Extracting Values
+
+=== Extract a Single Value
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=extract-path]
+----
+
+=== Extract as a Typed Object
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=extract-as-class]
+----
+
+=== Extract with Generic Types
+
+Use `TypeReference` for generic types like `List` or `Map`:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=extract-as-type-ref]
+----
+
+== Response Object
+
+Access the raw response outside the `then()` chain.
+
+=== Body as String
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=body-as-string]
+----
+
+=== Body as Bytes
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=body-as-bytes]
+----
+
+=== Pretty-Printed String
+
+Returns the JSON body formatted with indentation:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=pretty-string]
+----
+
+=== Pretty Print
+
+Prints the formatted response body to stdout and returns the `Response` for chaining:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=pretty-print]
+----
+
+=== Peek
+
+Prints the raw response body to stdout and returns the `Response`:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=peek]
+----
+
+=== Pretty Peek
+
+Prints the formatted response body and returns the `Response`:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=pretty-peek]
+----
+
+== Response Time
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=time]
+----
+
+With a specific time unit:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=time-in]
+----
+
+== Response Headers
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=get-header]
+----
+
+Access all headers with multi-value support:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=headers-object]
+----
+
+=== Header Assertions
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=assert-header]
+----
+
+Assert multiple headers in a single call using variadic name/value pairs:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=assert-headers-variadic]
+----
+
+== Content Type Assertion
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=assert-content-type]
+----
+
+== Cookies
+
+=== Cookie Assertions
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=assert-cookie]
+----
+
+=== Detailed Cookies
+
+Access full cookie attributes from the response:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=detailed-cookie]
+----
+
+== Root Path
+
+Avoid repeating a common JSON path prefix:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=root-path]
+----
+
+Use `appendRootPath()` and `detachRootPath()` for nested navigation:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=append-root]
+----
+
+== Custom Failure Message
+
+Add context to assertion failure messages:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=on-fail-message]
+----
+
+== Chaining Sugar
+
+`and()` and `assertThat()` are no-op methods for readability:
+
+[source,java]
+----
+include::{snippets-core}/ResponseSnippets.java[tag=chaining]
+----

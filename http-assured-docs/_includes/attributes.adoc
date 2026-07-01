@@ -1,0 +1,5 @@
+:source-highlighter: highlight.js
+:project-version: 0.1.0
+:github-repo: https://github.com/smallrye/http-assured
+:snippets-core: ../../_includes/snippets
+:snippets-junit5: ../../_includes/snippets-junit5

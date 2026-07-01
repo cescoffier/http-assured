@@ -1,0 +1,31 @@
+sections:
+  - title: Getting Started
+    items:
+      - label: Quickstart
+        url: /guides/getting-started
+      - label: Migration from REST Assured
+        url: /guides/migration
+  - title: Guides
+    items:
+      - label: Requests
+        url: /guides/requests
+      - label: Responses
+        url: /guides/responses
+      - label: Authentication & TLS
+        url: /guides/authentication
+      - label: Logging
+        url: /guides/logging
+      - label: Specifications & Configuration
+        url: /guides/specifications
+  - title: Advanced
+    items:
+      - label: WebSocket Testing
+        url: /guides/websocket
+      - label: Fault Injection (Toxics)
+        url: /guides/toxics
+      - label: JUnit 5 Extension
+        url: /guides/junit5
+  - title: Reference
+    items:
+      - label: API Reference
+        url: /reference/api

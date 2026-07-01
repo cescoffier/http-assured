@@ -1,0 +1,261 @@
+---
+layout: guide
+title: Requests
+description: Build HTTP requests with headers, parameters, body, and multipart uploads
+---
+include::../../_includes/attributes.adoc[]
+
+= Requests
+
+Build HTTP requests using the fluent given/when DSL. All methods return the builder for chaining.
+
+== HTTP Methods
+
+=== GET
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=get]
+----
+
+=== POST
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=post]
+----
+
+=== PUT
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=put]
+----
+
+=== PATCH
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=patch]
+----
+
+=== DELETE
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=delete]
+----
+
+=== HEAD
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=head]
+----
+
+=== OPTIONS
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=options]
+----
+
+== Query Parameters
+
+=== Single Value
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=query-single]
+----
+
+=== Multi-Value
+
+Pass multiple values for the same parameter name:
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=query-multi-value]
+----
+
+This sends `?role=admin&role=editor`.
+
+=== No-Value Parameter
+
+Emit a parameter key without a value:
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=query-no-value]
+----
+
+This sends `?verbose` with no `=`.
+
+== Path Parameters
+
+=== Named
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=path-param-named]
+----
+
+=== Positional
+
+Pass values directly to the HTTP method. They replace `{placeholders}` in order:
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=path-param-positional]
+----
+
+== Headers
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=header-single]
+----
+
+Multiple values for the same header name:
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=header-multi-value]
+----
+
+== Cookies
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=cookie]
+----
+
+== Content Type
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=content-type-enum]
+----
+
+Available constants: `ContentType.JSON`, `TEXT`, `HTML`, `XML`, `FORM_URL_ENCODED`, `MULTIPART_FORM_DATA`, `BINARY`.
+
+== Request Body
+
+=== String Body
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=body-string]
+----
+
+=== Map Body
+
+Maps are serialized to JSON automatically:
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=body-map]
+----
+
+=== Object Body
+
+Any object is serialized to JSON via Jackson:
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=body-object]
+----
+
+=== InputStream Body
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=body-inputstream]
+----
+
+=== Byte Array Body
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=body-bytes]
+----
+
+== Form Parameters
+
+Form parameters automatically set `Content-Type: application/x-www-form-urlencoded`:
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=form-param]
+----
+
+Using a map:
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=form-params-map]
+----
+
+== Multipart Uploads
+
+=== File Upload
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=multipart-file]
+----
+
+=== Byte Array Upload
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=multipart-bytes]
+----
+
+=== Text Field with File
+
+Combine text fields and file uploads in a single multipart request:
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=multipart-text]
+----
+
+== Accept Header
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=accept]
+----
+
+Or using the `ContentType` enum:
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=accept-enum]
+----
+
+== URL Encoding
+
+By default, query parameter values are URL-encoded. Disable this for pre-encoded values:
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=url-encoding-off]
+----
+
+== Generic Request Method
+
+Use `request()` when the HTTP method is determined at runtime:
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=request-enum]
+----
+
+Or with a string method name:
+
+[source,java]
+----
+include::{snippets-core}/RequestSnippets.java[tag=request-string]
+----

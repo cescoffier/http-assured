@@ -1,0 +1,3 @@
+# Snippet files copied from source modules at build time
+_includes/snippets/
+_includes/snippets-junit5/

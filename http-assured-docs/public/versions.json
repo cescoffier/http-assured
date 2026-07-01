@@ -1,0 +1,10 @@
+{
+  "latest": "dev",
+  "versions": [
+    {
+      "version": "dev",
+      "label": "Development",
+      "url": "/"
+    }
+  ]
+}

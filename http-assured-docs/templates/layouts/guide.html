@@ -1,0 +1,16 @@
+---
+layout: main
+---
+{@io.quarkiverse.roq.frontmatter.runtime.model.Page page}
+{@io.quarkiverse.roq.frontmatter.runtime.model.Site site}
+<div class="guide-layout">
+    {#include partials/sidebar /}
+    <article class="content">
+        {#insert /}
+    </article>
+    <nav class="toc">
+        <div class="toc__title">On this page</div>
+        <ul class="toc__links" id="toc-links">
+        </ul>
+    </nav>
+</div>

@@ -1,0 +1,138 @@
+---
+layout: guide
+title: Fault Injection (Toxics)
+description: Inject network faults into your tests with toxics
+---
+include::../../_includes/attributes.adoc[]
+
+= Fault Injection (Toxics)
+
+Toxics sit between your test client and the server, injecting network faults. They let you verify how your code handles latency, timeouts, connection resets, and other failures.
+
+== Simulate Latency
+
+Add a fixed delay to every request:
+
+[source,java]
+----
+include::{snippets-core}/ToxicSnippets.java[tag=latency]
+----
+
+Add jitter for more realistic behavior. The actual delay is `delay +/- jitter`:
+
+[source,java]
+----
+include::{snippets-core}/ToxicSnippets.java[tag=latency-jitter]
+----
+
+== Simulate Connection Down
+
+Refuse the connection entirely, as if the server is unreachable:
+
+[source,java]
+----
+include::{snippets-core}/ToxicSnippets.java[tag=down]
+----
+
+This throws an exception. Use it to verify your error handling or circuit breaker logic.
+
+== Simulate Timeout
+
+Accept the connection but never respond, forcing a client timeout:
+
+[source,java]
+----
+include::{snippets-core}/ToxicSnippets.java[tag=timeout]
+----
+
+== Simulate Connection Reset
+
+Close the connection abruptly, as if the server crashed mid-response:
+
+[source,java]
+----
+include::{snippets-core}/ToxicSnippets.java[tag=reset-peer]
+----
+
+== Limit Bandwidth
+
+Throttle the connection to a specific bytes-per-second rate:
+
+[source,java]
+----
+include::{snippets-core}/ToxicSnippets.java[tag=bandwidth]
+----
+
+== Return a Custom Response
+
+Skip the real server entirely and return a fixed response:
+
+[source,java]
+----
+include::{snippets-core}/ToxicSnippets.java[tag=respond-with]
+----
+
+Useful for testing how your code handles specific error responses.
+
+== Slow Close
+
+Delay the connection close, simulating a server that holds connections open:
+
+[source,java]
+----
+include::{snippets-core}/ToxicSnippets.java[tag=slow-close]
+----
+
+== Limit Data
+
+Cut the response after a certain number of bytes, simulating truncated responses:
+
+[source,java]
+----
+include::{snippets-core}/ToxicSnippets.java[tag=limit-data]
+----
+
+== Partial Application with Toxicity
+
+Apply a toxic only a percentage of the time. The `toxicity` value ranges from 0.0 (never) to 1.0 (always):
+
+[source,java]
+----
+include::{snippets-core}/ToxicSnippets.java[tag=toxicity]
+----
+
+This applies the 2-second latency to 50% of requests.
+
+== Programmatic Setup with ToxicEngine
+
+For full control, create a `ToxicEngine` with multiple toxics and pass it as the HTTP engine:
+
+[source,java]
+----
+include::{snippets-core}/ToxicSnippets.java[tag=toxic-engine]
+----
+
+== Using @WithToxic (JUnit 5)
+
+The `@WithToxic` annotation applies toxics declaratively on test methods. See the link:/guides/junit5[JUnit 5 Extension] guide.
+
+== Available Toxics
+
+[cols="1,1,2"]
+|===
+|Factory Method |Parameters |Description
+
+|`Toxic.latency(delay)` |`Duration` |Adds fixed delay to requests
+|`Toxic.latency(delay, jitter)` |`Duration, Duration` |Adds delay with randomized jitter
+|`Toxic.down()` |none |Refuses the connection
+|`Toxic.timeout(timeout)` |`Duration` |Accepts connection but never responds
+|`Toxic.resetPeer()` |none |Resets connection immediately
+|`Toxic.resetPeer(delay)` |`Duration` |Resets connection after delay
+|`Toxic.bandwidth(bytesPerSec)` |`long` |Limits bandwidth
+|`Toxic.slowClose(delay)` |`Duration` |Delays connection close
+|`Toxic.limitData(bytes)` |`long` |Truncates response after byte limit
+|`Toxic.respondWith(status)` |`int` |Returns fixed status code
+|`Toxic.respondWith(status, body)` |`int, String` |Returns fixed status and body
+|===
+
+All toxics support `.withToxicity(double)` to set probability and `.upstream()` to apply on the request path instead of response path.

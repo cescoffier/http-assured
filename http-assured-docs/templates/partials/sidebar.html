@@ -1,0 +1,10 @@
+<aside class="sidebar">
+    {#for section in cdi:navigation.sections}
+    <div class="sidebar__section-title">{section.title}</div>
+    <ul class="sidebar__links">
+        {#for item in section.items}
+        <li><a href="{site.url(item.url)}">{item.label}</a></li>
+        {/for}
+    </ul>
+    {/for}
+</aside>

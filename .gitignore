@@ -1,0 +1,14 @@
+.superpowers/
+target/
+node_modules/
+*.iml
+.idea/
+.settings/
+.classpath
+.project
+.factorypath
+.context/
+docs/
+AGENT.md
+*-plan.md
+.vscode/

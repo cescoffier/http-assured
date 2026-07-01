@@ -1,0 +1,104 @@
+---
+layout: guide
+title: Logging
+description: Log request and response details for debugging
+---
+include::../../_includes/attributes.adoc[]
+
+= Logging
+
+Log HTTP request and response details for debugging. Logs go to JBoss Logging.
+
+== Request Logging
+
+Log everything (method, URI, headers, body):
+
+[source,java]
+----
+include::{snippets-core}/LoggingSnippets.java[tag=request-all]
+----
+
+Log only headers:
+
+[source,java]
+----
+include::{snippets-core}/LoggingSnippets.java[tag=request-headers]
+----
+
+Log only the request body:
+
+[source,java]
+----
+include::{snippets-core}/LoggingSnippets.java[tag=request-body]
+----
+
+== Response Logging
+
+Log everything (status, headers, body):
+
+[source,java]
+----
+include::{snippets-core}/LoggingSnippets.java[tag=response-all]
+----
+
+Log only headers:
+
+[source,java]
+----
+include::{snippets-core}/LoggingSnippets.java[tag=response-headers]
+----
+
+Log only the response body:
+
+[source,java]
+----
+include::{snippets-core}/LoggingSnippets.java[tag=response-body]
+----
+
+== Log on Validation Failure
+
+Log request and response only when an assertion fails. Useful in CI where you want quiet tests but full diagnostics on failure:
+
+[source,java]
+----
+include::{snippets-core}/LoggingSnippets.java[tag=if-validation-fails]
+----
+
+Configure it once on the client builder instead of per-request:
+
+[source,java]
+----
+include::{snippets-core}/LoggingSnippets.java[tag=builder-log]
+----
+
+== Conditional Response Logging
+
+Log the response only when a specific status code is returned:
+
+[source,java]
+----
+include::{snippets-core}/LoggingSnippets.java[tag=if-status-code]
+----
+
+Log on any error status (4xx or 5xx):
+
+[source,java]
+----
+include::{snippets-core}/LoggingSnippets.java[tag=if-error]
+----
+
+Log with a custom predicate:
+
+[source,java]
+----
+include::{snippets-core}/LoggingSnippets.java[tag=if-status-matches]
+----
+
+== Blacklisting Headers
+
+Sensitive headers are hidden from log output. By default, `Authorization` and `Cookie` are blacklisted. Add more:
+
+[source,java]
+----
+include::{snippets-core}/LoggingSnippets.java[tag=blacklist]
+----

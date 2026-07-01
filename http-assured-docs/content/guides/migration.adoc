@@ -1,0 +1,179 @@
+---
+layout: guide
+title: Migration from REST Assured
+description: Migrate your REST Assured tests to http-assured
+---
+include::../../_includes/attributes.adoc[]
+
+= Migration from REST Assured
+
+This guide walks through migrating REST Assured tests to http-assured. The DSL is deliberately similar, so most changes are mechanical.
+
+== Why Migrate
+
+http-assured drops Groovy, replaces static global state with instance-based configuration, and adds fault injection. Your tests stay readable but gain thread safety and a modern dependency stack.
+
+== Before and After
+
+Here is a typical REST Assured test:
+
+[source,java]
+----
+// REST Assured
+import static io.restassured.RestAssured.*;
+import static org.hamcrest.Matchers.*;
+
+public class UserApiTest {
+
+    @BeforeAll
+    static void setup() {
+        RestAssured.baseURI = "http://localhost";
+        RestAssured.port = 8080;
+        RestAssured.basePath = "/api";
+    }
+
+    @Test
+    void shouldCreateUser() {
+        given()
+            .contentType(io.restassured.http.ContentType.JSON)
+            .body("{\"name\": \"Alice\"}")
+        .when()
+            .post("/users")
+        .then()
+            .statusCode(201)
+            .body("name", equalTo("Alice"))
+            .body("id", notNullValue());
+    }
+}
+----
+
+The same test with http-assured:
+
+[source,java]
+----
+include::{snippets-core}/MigrationSnippets.java[tag=after-complete]
+----
+
+=== Step 1: Replace Static Config with a Builder
+
+REST Assured uses static mutable globals. http-assured uses an instance builder:
+
+[cols="1,1"]
+|===
+|REST Assured |http-assured
+
+a|
+[source,java]
+----
+RestAssured.baseURI = "http://localhost";
+RestAssured.port = 8080;
+RestAssured.basePath = "/api";
+----
+
+a|
+[source,java]
+----
+include::{snippets-core}/MigrationSnippets.java[tag=after-builder]
+----
+|===
+
+Create the client in `@BeforeAll` or `@BeforeEach` and close it in `@AfterAll` or `@AfterEach`.
+
+=== Step 2: Replace Hamcrest with Assertions
+
+[cols="1,1"]
+|===
+|Hamcrest |http-assured
+
+|`equalTo(x)` |`Assertions.isEqualTo(x)`
+|`hasItems(a, b)` |`Assertions.containsAll(a, b)`
+|`hasSize(n)` |`Assertions.hasSize(n)`
+|`containsString(s)` |`Assertions.containsString(s)`
+|`greaterThan(n)` |`Assertions.greaterThan(n)`
+|`lessThan(n)` |`Assertions.lessThan(n)`
+|`nullValue()` |`Assertions.isNull()`
+|`notNullValue()` |`Assertions.isNotNull()`
+|===
+
+Example:
+
+[source,java]
+----
+include::{snippets-core}/MigrationSnippets.java[tag=after-assertions]
+----
+
+=== Step 3: Update Extract Calls
+
+REST Assured uses `.extract().path("id")`. http-assured shortens this to `.extract("id")`:
+
+[source,java]
+----
+include::{snippets-core}/MigrationSnippets.java[tag=after-extract]
+----
+
+=== Step 4: Update Response Methods
+
+[cols="1,1"]
+|===
+|REST Assured |http-assured
+
+|`response.asString()` |`response.bodyAsString()`
+|`response.asByteArray()` |`response.bodyAsBytes()`
+|`response.header("X")` |`response.getHeader("X")`
+|`response.as(Cls.class)` |`response.bodyAs(Cls.class)`
+|===
+
+[source,java]
+----
+include::{snippets-core}/MigrationSnippets.java[tag=after-response]
+----
+
+=== Step 5: Update Specs
+
+REST Assured's `RequestSpecBuilder` becomes `RequestSpec.builder()`:
+
+[source,java]
+----
+include::{snippets-core}/MigrationSnippets.java[tag=after-spec]
+----
+
+== JsonPath Differences
+
+Simple paths work identically. These differ:
+
+[cols="1,1,1"]
+|===
+|Pattern |REST Assured (GPath) |http-assured (Jayway JsonPath)
+
+|Negative index |`book[-1].title` |`$.book[-1:].title`
+|Filter |`book.findAll \{ it.price > 10 }` |`$.book[?(@.price > 10)]`
+|Size |`book.size()` |`$.book.length()`
+|Spread |`book*.author` |`$.book[*].author`
+|===
+
+== Import Changes
+
+[cols="1,1"]
+|===
+|REST Assured |http-assured
+
+|`import static io.restassured.RestAssured.given;`
+|No static import. Use `client.given()`
+
+|`import static org.hamcrest.Matchers.equalTo;`
+|`import static io.smallrye.httpassured.assertion.Assertions.isEqualTo;`
+
+|`import io.restassured.http.ContentType;`
+|`import io.smallrye.httpassured.http.ContentType;`
+|===
+
+== What is Not Supported
+
+These REST Assured features are intentionally excluded:
+
+* **XML/XPath/XSD/DTD** -- http-assured is JSON only
+* **Groovy GPath closures** -- use Jayway JsonPath filter syntax instead
+* **Static global config** -- use the instance builder
+* **JAXB/Gson/Jackson 1** -- Jackson 3 only
+* **Hamcrest matchers** -- use `Assertions.*` or `satisfies(predicate)`
+* **`expect().when()` syntax** -- use `given().when().then()`

@@ -1,0 +1,73 @@
+---
+layout: guide
+title: Specifications & Configuration
+description: Reuse request and response patterns across tests
+---
+include::../../_includes/attributes.adoc[]
+
+= Specifications & Configuration
+
+Avoid repetition by extracting common request and response patterns into reusable specifications.
+
+== Request Specifications
+
+Build a `RequestSpec` with shared headers, content type, and parameters:
+
+[source,java]
+----
+include::{snippets-core}/SpecSnippets.java[tag=request-spec-build]
+----
+
+Apply it to any request with `spec()`:
+
+[source,java]
+----
+include::{snippets-core}/SpecSnippets.java[tag=request-spec-use]
+----
+
+Request specs merge with any additional per-request configuration. Per-request settings take precedence.
+
+== Response Specifications
+
+Build a `ResponseSpec` for common response assertions:
+
+[source,java]
+----
+include::{snippets-core}/SpecSnippets.java[tag=response-spec-build]
+----
+
+Apply it in the `then()` phase:
+
+[source,java]
+----
+include::{snippets-core}/SpecSnippets.java[tag=response-spec-use]
+----
+
+You can add more assertions after `spec()`. The spec assertions run first.
+
+== Client Configuration
+
+Configure a client with common settings:
+
+[source,java]
+----
+include::{snippets-core}/SpecSnippets.java[tag=client-config]
+----
+
+All requests from this client inherit the base URI, port, base path, default headers, and timeout.
+
+== Redirect Control
+
+Prevent following redirects to inspect the redirect response:
+
+[source,java]
+----
+include::{snippets-core}/SpecSnippets.java[tag=redirect-dont-follow]
+----
+
+Limit the number of redirects to follow:
+
+[source,java]
+----
+include::{snippets-core}/SpecSnippets.java[tag=redirect-max]
+----

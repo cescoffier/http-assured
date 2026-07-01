@@ -1,0 +1,101 @@
+---
+layout: guide
+title: JUnit 5 Extension
+description: Use annotations to configure http-assured tests
+---
+include::../../_includes/attributes.adoc[]
+
+= JUnit 5 Extension
+
+The http-assured JUnit 5 extension manages client lifecycle and provides parameter injection. Add the dependency:
+
+[source,xml,subs=attributes+]
+----
+<dependency>
+    <groupId>io.smallrye</groupId>
+    <artifactId>http-assured-junit5</artifactId>
+    <version>{project-version}</version>
+    <scope>test</scope>
+</dependency>
+----
+
+== @HttpTest
+
+Annotate your test class with `@HttpTest` to auto-create an `HttpAssured` client:
+
+[source,java]
+----
+include::{snippets-junit5}/JUnit5Snippets.java[tag=http-test-annotation]
+----
+
+The extension creates one client per test class and injects it into test methods via parameter resolution. The client is closed automatically after all tests complete.
+
+=== Annotation Attributes
+
+[cols="1,1,2"]
+|===
+|Attribute |Default |Description
+
+|`baseUri` |`""` |Base URI for all requests
+|`port` |`-1` |HTTP port (uses URI port if -1)
+|`basePath` |`""` |Path prefix for all requests
+|===
+
+== @WithToxic
+
+Apply fault injection to individual test methods:
+
+[source,java]
+----
+include::{snippets-junit5}/JUnit5Snippets.java[tag=with-toxic-annotation]
+----
+
+The annotation wraps the client's HTTP engine in a `ToxicEngine` for that test method only. Other tests in the same class are unaffected.
+
+=== Annotation Attributes
+
+[cols="1,1,2"]
+|===
+|Attribute |Default |Description
+
+|`latencyMs` |`0` |Delay in milliseconds
+|`jitterMs` |`0` |Jitter range (used with latencyMs)
+|`bandwidthBytesPerSecond` |`0` |Bandwidth limit
+|`down` |`false` |Refuse connections
+|`resetPeer` |`false` |Reset connection
+|`resetPeerDelayMs` |`0` |Delay before reset
+|`timeoutMs` |`0` |Timeout simulation
+|`slowCloseMs` |`0` |Delay connection close
+|`limitDataBytes` |`0` |Truncate after N bytes
+|`respondWithStatus` |`0` |Return fixed status code
+|`toxicity` |`1.0` |Probability (0.0 to 1.0)
+|===
+
+=== Multiple Toxics
+
+`@WithToxic` is repeatable. Stack multiple annotations to combine effects:
+
+[source,java]
+----
+include::{snippets-junit5}/JUnit5Snippets.java[tag=multiple-toxics]
+----
+
+== @WebSocket
+
+Inject a `WsSession` into a test method parameter. The session connects before the test and closes after:
+
+[source,java]
+----
+include::{snippets-junit5}/JUnit5Snippets.java[tag=websocket-annotation]
+----
+
+The `@WebSocket` annotation takes the endpoint path as its value.
+
+== Combining Annotations
+
+Use `@HttpTest`, `@WithToxic`, and `@WebSocket` together. The extension handles client creation, toxic wrapping, and WebSocket lifecycle in the correct order.
+
+[source,java]
+----
+include::{snippets-junit5}/JUnit5Snippets.java[tag=combining-annotations]
+----

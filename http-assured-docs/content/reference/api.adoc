@@ -1,0 +1,67 @@
+---
+layout: guide
+title: API Reference
+---
+= API Reference
+
+== Core Classes
+
+=== HttpAssured
+
+Main entry point. Create instances via `HttpAssured.builder()`.
+
+[cols="1,3"]
+|===
+|Method |Description
+
+|`builder()`
+|Returns a new `HttpAssuredBuilder` for configuring a client instance.
+
+|`given()`
+|Starts the request specification phase.
+
+|`when()`
+|Shortcut for `given().when()` — starts directly with HTTP method execution.
+
+|`webSocket(String path)`
+|Opens a WebSocket session builder.
+
+|`close()`
+|Closes the HTTP engine and releases resources.
+|===
+
+=== RequestBuilder
+
+Fluent builder for the "given" phase.
+
+=== ValidatableResponse
+
+Assertion interface for the "then" phase.
+
+=== Response
+
+Raw response object with `statusCode()`, `headers()`, `bodyAsString()`, `bodyAs(Class)`.
+
+=== Assertions
+
+Static assertion helpers: `isEqualTo`, `isNotNull`, `satisfies`, `hasSize`, `contains`, `matchesPattern`, `greaterThan`, `lessThan`, and more.
+
+== SPI Interfaces
+
+=== HttpClientEngine
+
+Implement this to provide a custom HTTP client backend.
+
+=== ObjectMapperProvider
+
+Implement this to provide a custom JSON serializer/deserializer.
+
+== Configuration
+
+=== HttpAssuredConfig
+
+Immutable configuration. Built via `HttpAssured.builder()`.
+
+=== RequestSpec / ResponseSpec
+
+Reusable specification objects for shared request/response configuration.

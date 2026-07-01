@@ -1,0 +1,84 @@
+---
+layout: guide
+title: Authentication & TLS
+description: Configure authentication methods and TLS trust for secure endpoints
+---
+include::../../_includes/attributes.adoc[]
+
+= Authentication & TLS
+
+== Basic Authentication
+
+Send credentials using HTTP Basic authentication:
+
+[source,java]
+----
+include::{snippets-core}/AuthSnippets.java[tag=basic]
+----
+
+Credentials are sent only after the server responds with a 401 challenge.
+
+== Preemptive Basic Authentication
+
+Send credentials on the first request without waiting for a 401:
+
+[source,java]
+----
+include::{snippets-core}/AuthSnippets.java[tag=preemptive]
+----
+
+Use preemptive auth when the server does not send a WWW-Authenticate challenge.
+
+== OAuth 2
+
+Send a Bearer token in the Authorization header:
+
+[source,java]
+----
+include::{snippets-core}/AuthSnippets.java[tag=oauth2]
+----
+
+== OAuth 1
+
+Sign requests with OAuth 1.0a credentials:
+
+[source,java]
+----
+include::{snippets-core}/AuthSnippets.java[tag=oauth1]
+----
+
+== Trust All Certificates
+
+Accept any server certificate, including self-signed ones. This is the equivalent of REST Assured's `relaxedHTTPSValidation()`:
+
+[source,java]
+----
+include::{snippets-core}/AuthSnippets.java[tag=trust-all]
+----
+
+WARNING: Only use `trustAll(true)` in tests. Never in production code.
+
+== Custom Trust Options
+
+Use a specific trust store instead of trusting all certificates.
+
+=== PEM Certificate
+
+[source,java]
+----
+include::{snippets-core}/AuthSnippets.java[tag=trust-pem]
+----
+
+=== JKS Trust Store
+
+[source,java]
+----
+include::{snippets-core}/AuthSnippets.java[tag=trust-jks]
+----
+
+=== PKCS12 Trust Store
+
+[source,java]
+----
+include::{snippets-core}/AuthSnippets.java[tag=trust-pkcs12]
+----

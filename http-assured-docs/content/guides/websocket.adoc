@@ -1,0 +1,76 @@
+---
+layout: guide
+title: WebSocket Testing
+description: Test WebSocket endpoints with the WsSession API
+---
+include::../../_includes/attributes.adoc[]
+
+= WebSocket Testing
+
+Test WebSocket endpoints using a fluent session API. Sessions auto-close with try-with-resources.
+
+== Opening a Session
+
+[source,java]
+----
+include::{snippets-core}/WebSocketSnippets.java[tag=connect]
+----
+
+Add headers or query parameters to the WebSocket handshake:
+
+[source,java]
+----
+include::{snippets-core}/WebSocketSnippets.java[tag=connect-options]
+----
+
+== Sending and Receiving Text
+
+[source,java]
+----
+include::{snippets-core}/WebSocketSnippets.java[tag=send-text]
+----
+
+`awaitText()` blocks until a message arrives or the timeout expires. If no message arrives, it throws `HttpAssuredException`.
+
+== Binary Messages
+
+[source,java]
+----
+include::{snippets-core}/WebSocketSnippets.java[tag=send-binary]
+----
+
+== Closing a Session
+
+Close without a status code:
+
+[source,java]
+----
+include::{snippets-core}/WebSocketSnippets.java[tag=close]
+----
+
+Close with a status code and reason:
+
+[source,java]
+----
+include::{snippets-core}/WebSocketSnippets.java[tag=close-code]
+----
+
+== Auto-Close with Try-With-Resources
+
+`WsSession` implements `AutoCloseable`. Prefer try-with-resources to avoid leaking connections:
+
+[source,java]
+----
+include::{snippets-core}/WebSocketSnippets.java[tag=try-with-resources]
+----
+
+== Checking Session State
+
+[source,java]
+----
+include::{snippets-core}/WebSocketSnippets.java[tag=is-open]
+----
+
+== JUnit 5 Integration
+
+Use the `@WebSocket` annotation to inject a `WsSession` directly into test methods. See link:/guides/junit5[JUnit 5 Extension] for details.

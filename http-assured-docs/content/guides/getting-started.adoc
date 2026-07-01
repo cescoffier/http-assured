@@ -1,0 +1,93 @@
+---
+layout: guide
+title: Getting Started
+description: Learn how to use http-assured for HTTP testing in Java
+---
+include::../../_includes/attributes.adoc[]
+
+= Getting Started with http-assured
+
+http-assured is a fluent Java library for testing HTTP APIs and WebSocket endpoints. It brings a clean, readable DSL inspired by REST Assured, designed from the ground up for modern Java.
+
+== Installation
+
+Add http-assured to your Maven project:
+
+[source,xml,subs=attributes+]
+----
+<dependency>
+    <groupId>io.smallrye</groupId>
+    <artifactId>http-assured-core</artifactId>
+    <version>{project-version}</version>
+    <scope>test</scope>
+</dependency>
+----
+
+For Gradle:
+
+[source,groovy,subs=attributes+]
+----
+testImplementation 'io.smallrye:http-assured-core:{project-version}'
+----
+
+== Creating a Client
+
+Create an `HttpAssured` client instance with your base configuration:
+
+[source,java]
+----
+include::{snippets-core}/GettingStartedSnippets.java[tag=create-client]
+----
+
+The client is thread-safe and reusable. Keep a single instance for your test suite.
+
+== Making Requests
+
+http-assured uses a fluent given/when/then DSL.
+
+=== Basic GET Request
+
+[source,java]
+----
+include::{snippets-core}/GettingStartedSnippets.java[tag=basic-get]
+----
+
+=== POST with JSON Body
+
+[source,java]
+----
+include::{snippets-core}/GettingStartedSnippets.java[tag=post-json]
+----
+
+=== Query Parameters
+
+[source,java]
+----
+include::{snippets-core}/GettingStartedSnippets.java[tag=query-params]
+----
+
+== Response Validation
+
+=== JSON Path Assertions
+
+Extract and assert values from JSON responses using JSON path expressions:
+
+[source,java]
+----
+include::{snippets-core}/GettingStartedSnippets.java[tag=json-path]
+----
+
+The `body()` method accepts a path expression and a `BodyAssertion`. Common assertions from `io.smallrye.httpassured.assertion.Assertions`:
+
+* `isNotNull()` -- value must not be null
+* `isEqualTo(expected)` -- value equals expected
+* `containsString(substring)` -- string contains substring
+* `hasSize(n)` -- collection has n elements
+* `satisfies(predicate)` -- custom predicate check
+
+== Next Steps
+
+* Explore link:/guides/requests[Requests] for all request options
+* Learn about link:/guides/responses[Responses] for assertions and extraction
+* Check link:/guides/migration[Migration from REST Assured] if you are migrating
+* Set up link:/guides/junit5[JUnit 5 Extension] for annotation-driven tests
