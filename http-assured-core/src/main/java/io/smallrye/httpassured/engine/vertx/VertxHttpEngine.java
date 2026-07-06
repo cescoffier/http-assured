@@ -35,6 +35,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * HTTP client engine backed by Vert.x HTTP Client.
@@ -291,10 +293,22 @@ public class VertxHttpEngine implements HttpClientEngine {
 
     @Override
     public void close() {
-        httpClient.close();
-        webSocketClient.close();
+        CountDownLatch clientLatch = new CountDownLatch(2);
+        httpClient.close().onComplete(v -> clientLatch.countDown());
+        webSocketClient.close().onComplete(v -> clientLatch.countDown());
+        try {
+            clientLatch.await(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         if (ownsVertx) {
-            vertx.close();
+            CountDownLatch vertxLatch = new CountDownLatch(1);
+            vertx.close().onComplete(v -> vertxLatch.countDown());
+            try {
+                vertxLatch.await(10, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
