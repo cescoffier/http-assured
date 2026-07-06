@@ -319,12 +319,16 @@ abstract class AbstractHttpsTest {
     @Nested
     class TlsCertificateValidation {
 
+        private HttpAssured buildIsolatedClient() {
+            return HttpAssured.builder()
+                    .baseUri("https://localhost").port(httpsPort)
+                    .engine(new VertxHttpEngine())
+                    .build();
+        }
+
         @Test
         void shouldSucceedWithTrustAllTrue() {
-            HttpAssured client = HttpAssured.builder()
-                    .baseUri("https://localhost").port(httpsPort)
-                    .engine(new VertxHttpEngine(vertx))
-                    .build();
+            HttpAssured client = buildIsolatedClient();
             try {
                 assertDoesNotThrow(() ->
                         client.given().trustAll(true)
@@ -337,10 +341,7 @@ abstract class AbstractHttpsTest {
 
         @Test
         void shouldRejectUntrustedCert() {
-            HttpAssured client = HttpAssured.builder()
-                    .baseUri("https://localhost").port(httpsPort)
-                    .engine(new VertxHttpEngine(vertx))
-                    .build();
+            HttpAssured client = buildIsolatedClient();
             try {
                 assertThrows(HttpAssuredException.class, () ->
                         client.given().trustAll(false)
@@ -352,10 +353,7 @@ abstract class AbstractHttpsTest {
 
         @Test
         void shouldSucceedWithMatchingFormatTrustStore() {
-            HttpAssured client = HttpAssured.builder()
-                    .baseUri("https://localhost").port(httpsPort)
-                    .engine(new VertxHttpEngine(vertx))
-                    .build();
+            HttpAssured client = buildIsolatedClient();
             try {
                 TrustOptions opts = buildClientTrustOptions(certFiles);
                 assertDoesNotThrow(() ->

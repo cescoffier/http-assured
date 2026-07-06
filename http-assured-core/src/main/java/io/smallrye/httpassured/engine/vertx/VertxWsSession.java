@@ -100,9 +100,23 @@ class VertxWsSession implements WsSession {
     @Override
     public Multi<String> textMessages() {
         return Multi.createFrom().emitter(emitter -> {
+            // Switch to live handler first so no new messages are lost
             webSocket.textMessageHandler(msg -> emitter.emit(msg));
             webSocket.closeHandler(v -> emitter.complete());
             webSocket.exceptionHandler(emitter::fail);
+
+            // Drain messages that were buffered before subscription
+            Object queued;
+            while ((queued = textQueue.poll()) != null) {
+                if (CLOSE_SENTINEL.equals(queued)) {
+                    emitter.complete();
+                    return;
+                }
+                emitter.emit((String) queued);
+            }
+            if (closed) {
+                emitter.complete();
+            }
         });
     }
 
@@ -112,6 +126,18 @@ class VertxWsSession implements WsSession {
             webSocket.binaryMessageHandler(buffer -> emitter.emit(buffer.getBytes()));
             webSocket.closeHandler(v -> emitter.complete());
             webSocket.exceptionHandler(emitter::fail);
+
+            byte[] queued;
+            while ((queued = binaryQueue.poll()) != null) {
+                if (queued.length == 0 && closed) {
+                    emitter.complete();
+                    return;
+                }
+                emitter.emit(queued);
+            }
+            if (closed) {
+                emitter.complete();
+            }
         });
     }
 
