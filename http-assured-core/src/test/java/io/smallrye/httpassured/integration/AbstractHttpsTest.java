@@ -151,7 +151,7 @@ abstract class AbstractHttpsTest {
         trustedClient = HttpAssured.builder()
                 .baseUri("https://localhost")
                 .port(httpsPort)
-                .engine(new VertxHttpEngine(vertx))
+                .engine(new VertxHttpEngine())
                 .build();
     }
 
