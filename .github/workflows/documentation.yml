@@ -1,0 +1,122 @@
+name: Documentation
+
+on:
+  push:
+    branches:
+      - main
+      - 'docs/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Determine version
+        id: version
+        run: |
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          if [ "$BRANCH" = "main" ]; then
+            echo "version=dev" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${BRANCH#docs/}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build library modules (compile snippets)
+        run: mvn compile test-compile -pl !http-assured-docs -B
+
+      - name: Generate ROQ site
+        uses: quarkiverse/quarkus-roq@v1.1
+        with:
+          roq-dir: http-assured-docs
+
+      - name: Prepare versioned output
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          mkdir -p site/${VERSION}
+          cp -r http-assured-docs/target/roq/* site/${VERSION}/
+
+      - name: Download existing site
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          path: existing-site
+        continue-on-error: true
+
+      - name: Merge with existing versions
+        run: |
+          if [ -d existing-site ]; then
+            # Extract existing site, overlay new version
+            cd existing-site && tar xf artifact.tar 2>/dev/null || true && cd ..
+            cp -rn existing-site/* site/ 2>/dev/null || true
+          fi
+
+          VERSION="${{ steps.version.outputs.version }}"
+
+          # Update versions.json
+          cd site
+          if [ ! -f versions.json ]; then
+            echo '{"latest":"dev","versions":[]}' > versions.json
+          fi
+
+          # Add or update version entry
+          python3 -c "
+          import json, sys
+          v = '$VERSION'
+          with open('versions.json') as f:
+              data = json.load(f)
+          versions = [x for x in data['versions'] if x['version'] != v]
+          label = 'Development' if v == 'dev' else v
+          if v != 'dev':
+              label += ' (latest)' if not any(x['version'] not in ('dev', v) for x in versions if x['version'] != 'dev') else ''
+              data['latest'] = v
+              for x in versions:
+                  if '(latest)' in x.get('label', ''):
+                      x['label'] = x['version']
+          versions.insert(0 if v == 'dev' else 1, {'version': v, 'label': label, 'url': '/' + v + '/'})
+          data['versions'] = versions
+          with open('versions.json', 'w') as f:
+              json.dump(data, f, indent=2)
+          "
+          cd ..
+
+          # Create root redirect
+          cat > site/index.html << 'REDIRECT'
+          <!DOCTYPE html>
+          <html>
+          <head><meta http-equiv="refresh" content="0;url=dev/"></head>
+          <body><a href="dev/">Redirecting...</a></body>
+          </html>
+          REDIRECT
+
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
